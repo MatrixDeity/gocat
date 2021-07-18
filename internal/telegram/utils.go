@@ -10,11 +10,10 @@ func makeHeader(contentType string) http.Header {
 }
 
 func makeKeyboardMarkup(buttons []string) *ReplyKeyboardMarkup {
-	keyboard := make([][]*KeyboardButton, 1)
-	keyboard[0] = make([]*KeyboardButton, 0, len(buttons))
-	for _, buttonLabel := range buttons {
+	keyboard := make([][]*KeyboardButton, len(buttons))
+	for index, buttonLabel := range buttons {
 		button := &KeyboardButton{Text: buttonLabel}
-		keyboard[0] = append(keyboard[0], button)
+		keyboard[index] = []*KeyboardButton{button}
 	}
 	return &ReplyKeyboardMarkup{InlineKeyboard: keyboard, ResizeKeyboard: true}
 }

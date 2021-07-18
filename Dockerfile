@@ -5,4 +5,4 @@ RUN go build -o ./gocat ./cmd
 
 FROM alpine:latest
 COPY --from=builder /build/gocat /app/
-CMD ["/app/gocat"]
+CMD /app/gocat -token=${GOCAT_TELEGRAM_TOKEN}

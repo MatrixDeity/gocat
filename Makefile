@@ -20,7 +20,8 @@ build: ## build an executable file of GoCat service.
 
 .PHONY: start
 start: ## build and run an executable file of GoCat service.
-	@go run ./cmd
+	@test -n "$(GOCAT_TELEGRAM_TOKEN)" || (echo "Set GOCAT_TELEGRAM_TOKEN env" >&2 && exit 1)
+	@go run ./cmd -token="$(GOCAT_TELEGRAM_TOKEN)"
 
 .PHONY: clean
 clean: ## clean a working directory.
