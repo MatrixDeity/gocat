@@ -5,4 +5,5 @@ RUN go build -o ./gocat ./cmd
 
 FROM alpine:latest
 COPY --from=builder /build/gocat /app/
+RUN apk add --no-cache tzdata
 CMD /app/gocat -token=${GOCAT_TELEGRAM_TOKEN}
