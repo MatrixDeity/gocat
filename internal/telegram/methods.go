@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func (c *Client) GetUpdates(offset int) ([]*Update, error) {
+func (c *Client) GetUpdates(offset int64) ([]*Update, error) {
 	body, _ := json.Marshal(getUpdatesData{offset})
 
 	response, err := c.makeRequest(http.MethodPost, "/getUpdates", bytes.NewReader(body), makeHeader("application/json"))
@@ -22,7 +22,7 @@ func (c *Client) GetUpdates(offset int) ([]*Update, error) {
 	return updates, nil
 }
 
-func (c *Client) SendMessage(chatID int, text string) (*Message, error) {
+func (c *Client) SendMessage(chatID int64, text string) (*Message, error) {
 	body, _ := json.Marshal(sendMessageData{chatID, text})
 
 	response, err := c.makeRequest(http.MethodPost, "/sendMessage", bytes.NewReader(body), makeHeader("application/json"))
@@ -35,7 +35,7 @@ func (c *Client) SendMessage(chatID int, text string) (*Message, error) {
 	return message, nil
 }
 
-func (c *Client) SendPhoto(chatID int, photo []byte, buttons []string) (*Message, error) {
+func (c *Client) SendPhoto(chatID int64, photo []byte, buttons []string) (*Message, error) {
 	body := &bytes.Buffer{}
 	mpwriter := multipart.NewWriter(body)
 
@@ -61,7 +61,7 @@ func (c *Client) SendPhoto(chatID int, photo []byte, buttons []string) (*Message
 	return message, nil
 }
 
-func (c *Client) SendChatAction(chatID int, action string) error {
+func (c *Client) SendChatAction(chatID int64, action string) error {
 	body, _ := json.Marshal(sendChatActionData{chatID, action})
 
 	_, err := c.makeRequest(http.MethodPost, "/sendChatAction", bytes.NewReader(body), makeHeader("application/json"))

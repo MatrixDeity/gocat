@@ -11,18 +11,18 @@ type Result struct {
 
 type Update struct {
 	Message *Message `json:"message"`
-	ID      int      `json:"update_id"`
+	ID      int64    `json:"update_id"`
 }
 
 type Message struct {
 	Date int    `json:"date"`
 	From *User  `json:"from"`
-	ID   int    `json:"message_id"`
+	ID   int64  `json:"message_id"`
 	Text string `json:"text"`
 }
 
 type User struct {
-	ID       int    `json:"id"`
+	ID       int64  `json:"id"`
 	IsBot    bool   `json:"is_bot"`
 	Username string `json:"username"`
 }
@@ -37,15 +37,15 @@ type KeyboardButton struct {
 }
 
 type getUpdatesData struct {
-	Offset int `json:"offset"`
+	Offset int64 `json:"offset"`
 }
 
 type sendMessageData struct {
-	ChatID int    `json:"chat_id"`
+	ChatID int64  `json:"chat_id"`
 	Text   string `json:"text"`
 }
 
 type sendChatActionData struct {
-	ChatID int    `json:"chat_id"`
+	ChatID int64  `json:"chat_id"`
 	Action string `json:"action"`
 }

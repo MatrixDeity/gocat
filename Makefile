@@ -30,3 +30,7 @@ clean: ## clean a working directory.
 .PHONY: push
 push: ## push builded docker image.
 	@docker push $(MAINTAINER_NAME)/$(PROJECT_NAME)
+
+.PHONY: format
+format: ## format a code of the project by gofmt
+	@gofmt -w -s .

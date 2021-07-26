@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"sync"
@@ -21,7 +20,7 @@ const (
 type Bot struct {
 	telegramClient *telegram.Client
 	cataasClient   *cataas.Client
-	lastUpdateID   int
+	lastUpdateID   int64
 	stopChan       chan os.Signal
 	goroutines     sync.WaitGroup
 }
@@ -36,7 +35,8 @@ func NewBot(telegramToken string) *Bot {
 }
 
 func (b *Bot) Run() {
-	log.Println("GoCat is running")
+	log := newLogger(noChatID)
+	log.info("GoCat is running")
 	signal.Notify(b.stopChan, syscall.SIGINT, syscall.SIGTERM)
 
 	updatesChan := b.pollUpdates()
@@ -50,17 +50,19 @@ func (b *Bot) Run() {
 	}
 	b.goroutines.Wait()
 
-	log.Println("GoCat stopped")
+	log.info("GoCat stopped")
 }
 
 func (b *Bot) pollUpdates() chan *telegram.Update {
 	updatesChan := make(chan *telegram.Update)
 
-	go func() {
+	go func(updatesChan chan<- *telegram.Update) {
 		b.fetchUpdates()
-		for {
+		ticker := time.NewTicker(time.Second)
+		for range ticker.C {
 			select {
 			case <-b.stopChan:
+				ticker.Stop()
 				close(updatesChan)
 				return
 			default:
@@ -69,9 +71,8 @@ func (b *Bot) pollUpdates() chan *telegram.Update {
 			for _, update := range b.fetchUpdates() {
 				updatesChan <- update
 			}
-			time.Sleep(time.Second)
 		}
-	}()
+	}(updatesChan)
 
 	return updatesChan
 }
@@ -93,31 +94,27 @@ func (b *Bot) fetchUpdates() []*telegram.Update {
 
 func (b *Bot) processMessage(message *telegram.Message) {
 	chatID := message.From.ID
-	logForChat(chatID, "process request")
+	log := newLogger(chatID)
+
+	log.info("process request")
 	switch message.Text {
 	case StartCommand, GoCommand:
-		b.sendCatPhoto(chatID)
+		b.sendCatPhoto(chatID, log)
 	default:
-		logForChat(chatID, "bad command: "+message.Text)
+		log.info("bad command: " + message.Text)
 	}
-	logForChat(chatID, "done")
+	log.info("done")
 }
 
-func (b *Bot) sendCatPhoto(chatID int) {
+func (b *Bot) sendCatPhoto(chatID int64, log *logger) {
 	defer b.goroutines.Done()
 
 	err := b.telegramClient.SendChatAction(chatID, telegram.UploadPhotoChatAction)
-	logForChat(chatID, err)
+	log.error(err)
 
 	photo, err := b.cataasClient.GetCatPhoto()
-	logForChat(chatID, err)
+	log.error(err)
 
 	_, err = b.telegramClient.SendPhoto(chatID, photo, []string{GoCommand})
-	logForChat(chatID, err)
-}
-
-func logForChat(chatId int, printable interface{}) {
-	if printable != nil {
-		log.Printf("chat:%d %s", chatId, printable)
-	}
+	log.error(err)
 }
