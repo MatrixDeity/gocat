@@ -93,6 +93,8 @@ func (b *Bot) fetchUpdates() []*telegram.Update {
 }
 
 func (b *Bot) processMessage(message *telegram.Message) {
+	defer b.goroutines.Done()
+
 	chatID := message.From.ID
 	log := newLogger(chatID)
 
@@ -107,8 +109,6 @@ func (b *Bot) processMessage(message *telegram.Message) {
 }
 
 func (b *Bot) sendCatPhoto(chatID int64, log *logger) {
-	defer b.goroutines.Done()
-
 	err := b.telegramClient.SendChatAction(chatID, telegram.UploadPhotoChatAction)
 	log.error(err)
 
