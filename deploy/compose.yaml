@@ -1,0 +1,8 @@
+services:
+  gocat:
+    image: matrixdeity/gocat:latest
+    container_name: gocat
+    environment:
+      GOCAT_TELEGRAM_TOKEN: <token>
+      TZ: Europe/Moscow
+    restart: unless-stopped
